@@ -1,0 +1,65 @@
+[NEAT]
+fitness_criterion = max
+fitness_threshold = 1000
+pop_size = 100
+reset_on_extinction = False
+
+[DefaultGenome]
+# Number of input nodes (e.g., 10x10 board = 100 inputs)
+num_inputs = 100
+
+# Number of output nodes (e.g., (x, y) coordinates = 2 outputs)
+num_outputs = 2
+
+# Number of hidden nodes (start with 0; NEAT will add them)
+num_hidden = 0
+
+# Initial connection type
+initial_connection = full
+
+# Activation function
+activation_default = sigmoid
+activation_options = sigmoid
+
+# Aggregation function
+aggregation_default = sum
+aggregation_options = sum
+
+# Connection probabilities
+conn_add_prob = 0.5
+conn_delete_prob = 0.5
+
+# Node probabilities
+node_add_prob = 0.2
+node_delete_prob = 0.2
+
+# Weight initialization
+weight_init_mean = 0.0
+weight_init_stdev = 1.0
+weight_max_value = 30.0
+weight_min_value = -30.0
+weight_mutate_rate = 0.8
+weight_replace_rate = 0.1
+weight_mutate_power = 0.5
+
+# Bias initialization
+bias_init_mean = 0.0
+bias_init_stdev = 1.0
+bias_max_value = 30.0
+bias_min_value = -30.0
+bias_mutate_rate = 0.7
+bias_replace_rate = 0.1
+bias_mutate_power = 0.5
+
+[DefaultSpeciesSet]
+compatibility_threshold = 3.0
+
+[DefaultStagnation]
+species_fitness_func = max
+max_stagnation = 15
+species_elitism = 2
+
+[DefaultReproduction]
+elitism = 2
+survival_threshold = 0.2
+min_species_size = 2

@@ -6,13 +6,13 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.font.init()
-        self.default_width = 800  # Set a larger default width
+        self.default_width = 800  
         self.default_height = 600  # Set a larger default height
         self.screen = pygame.display.set_mode((self.default_width, self.default_height))
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
-        self.difficulty = 'easy'  # Default difficulty
-        self.win = False  # Flag to indicate if the player has won
+        self.difficulty = 'easy'  
+        self.win = False  
 
     def set_screen_size(self):
         settings = DIFFICULTY_SETTINGS[self.difficulty]
