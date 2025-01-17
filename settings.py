@@ -14,9 +14,15 @@ BGCOLOUR = DARKGRAY
 
 
 TILESIZE = 32
-ROWS = 15
-COLS = 15
-AMOUT_MINES = 5
+FPS = 60
+TITLE = "Minesweeper python"
+ROWS= 20
+COLS=20
+DIFFICULTY_SETTINGS = {
+    'easy': {'AMOUT_MINES': 20, 'ROWS': 15, 'COLS': 15},
+    'medium': {'AMOUT_MINES': 40, 'ROWS': 25, 'COLS': 25},
+    'hard': {'AMOUT_MINES': 180, 'ROWS': 35, 'COLS': 35}
+}
 WIDTH = TILESIZE * ROWS
 HEIGHT = TILESIZE * COLS
 FPS = 60
