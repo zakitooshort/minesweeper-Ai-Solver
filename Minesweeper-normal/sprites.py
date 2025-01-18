@@ -1,6 +1,5 @@
 import pygame
 import random
-import numpy as np
 from settings import *
 
 class Tile:
@@ -88,24 +87,6 @@ class Board:
                 if (row, col) not in self.dug:
                     self.dig(row, col)
         return True
-
-    def get_state(self):
-        """
-        Get the current state of the board for the AI.
-        """
-        state = np.zeros((self.rows, self.cols), dtype=int)
-        for x in range(self.rows):
-            for y in range(self.cols):
-                if self.board_list[x][y].revealed:
-                    if self.board_list[x][y].type == "C":
-                        state[x][y] = self.check_neighbours(x, y)
-                    else:
-                        state[x][y] = -1  # Unrevealed or mine
-                elif self.board_list[x][y].flagged:
-                    state[x][y] = 9  # Flagged
-                else:
-                    state[x][y] = -1  # Unrevealed
-        return state
 
     def display_board(self):
         for row in self.board_list:

@@ -1,172 +1,140 @@
 import pygame
-from sprites import Board  # Import the Board class
+import numpy as np
+import neat
+import os
+import pickle
+from sprites import Board
 from settings import *
 
-class Game:
-    def __init__(self):
-        pygame.init()
-        pygame.font.init()
-        self.default_width = 800  
-        self.default_height = 600  # Set a larger default height
-        self.screen = pygame.display.set_mode((self.default_width, self.default_height))
-        pygame.display.set_caption(TITLE)
-        self.clock = pygame.time.Clock()
-        self.difficulty = 'easy'  
-        self.win = False  
+class MinesweeperAI:
+    def __init__(self, rows=5, cols=5, num_mines=3):
+        self.rows = rows
+        self.cols = cols
+        self.num_mines = num_mines
+        self.board = Board(rows, cols, num_mines)
 
-    def set_screen_size(self):
-        settings = DIFFICULTY_SETTINGS[self.difficulty]
-        self.width = TILESIZE * settings['COLS']
-        self.height = TILESIZE * settings['ROWS']
+    def get_state(self):
+        state = []
+        for x in range(self.rows):
+            for y in range(self.cols):
+                tile = self.board.board_list[x][y]
+                if tile.revealed:
+                    if tile.type == "C":
+                        state.append(self.board.check_neighbours(x, y))
+                    else:
+                        state.append(9)
+                elif tile.flagged:
+                    state.append(10)
+                else:
+                    state.append(-1)
+        return np.array(state)
 
-    def home_page(self):
-        self.screen.fill(BGCOLOUR)
-        font = pygame.font.Font(None, 74)
-        text = font.render('Choose Difficulty', True, (255, 255, 255))
-        self.screen.blit(text, (self.default_width // 2 - text.get_width() // 2, self.default_height // 4))
+    def make_move(self, net):
+        state = self.get_state()
+        output = net.activate(state)
 
-        easy_button = pygame.Rect(self.default_width // 2 - 100, self.default_height // 2 - 50, 200, 50)
-        medium_button = pygame.Rect(self.default_width // 2 - 100, self.default_height // 2 + 10, 200, 50)
-        hard_button = pygame.Rect(self.default_width // 2 - 100, self.default_height // 2 + 70, 200, 50)
+        valid_moves = []
+        for x in range(self.rows):
+            for y in range(self.cols):
+                if not self.board.board_list[x][y].revealed and not self.board.board_list[x][y].flagged:
+                    valid_moves.append((x, y))
 
-        pygame.draw.rect(self.screen, (0, 255, 0), easy_button)
-        pygame.draw.rect(self.screen, (255, 255, 0), medium_button)
-        pygame.draw.rect(self.screen, (255, 0, 0), hard_button)
+        if not valid_moves:
+            return None
 
-        font = pygame.font.Font(None, 36)
-        text = font.render('Easy', True, (0, 0, 0))
-        self.screen.blit(text, (easy_button.x + 50, easy_button.y + 10))
-        text = font.render('Medium', True, (0, 0, 0))
-        self.screen.blit(text, (medium_button.x + 35, medium_button.y + 10))
-        text = font.render('Hard', True, (0, 0, 0))
-        self.screen.blit(text, (hard_button.x + 50, hard_button.y + 10))
+        best_move = None
+        best_score = -float('inf')
+        for x, y in valid_moves:
+            move_index = x * self.cols + y
+            if output[move_index] > best_score:
+                best_score = output[move_index]
+                best_move = (x, y)
 
-        pygame.display.flip()
+        return best_move
 
-        choosing = True
-        while choosing:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit(0)
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if easy_button.collidepoint(event.pos):
-                        self.difficulty = 'easy'
-                        choosing = False
-                    elif medium_button.collidepoint(event.pos):
-                        self.difficulty = 'medium'
-                        choosing = False
-                    elif hard_button.collidepoint(event.pos):
-                        self.difficulty = 'hard'
-                        choosing = False
+    def play_game(self, net):
+        self.board = Board(self.rows, self.cols, self.num_mines)
+        fitness = 0
+        while True:
+            move = self.make_move(net)
+            if move is None:
+                print("No valid moves left. Game over.")
+                break
 
-        self.set_screen_size()
-        self.screen = pygame.display.set_mode((self.width, self.height))
-
-    def new(self):
-        settings = DIFFICULTY_SETTINGS[self.difficulty]
-        self.board = Board(settings['ROWS'], settings['COLS'], settings['AMOUT_MINES'])
-        self.board.display_board()
-
-    def run(self):
-        self.playing = True
-        while self.playing:
-            self.clock.tick(FPS)
-            self.events()
-            self.draw()
-        self.end_screen()
-
-    def draw(self):
-        self.screen.fill(BGCOLOUR)
-        self.board.draw(self.screen)
-        pygame.display.flip()
+            x, y = move
+            print(f"AI move: ({x}, {y})")
+            if not self.board.dig(x, y):
+                fitness -= 10
+                print("AI hit a mine! Game over.")
+                break
+            else:
+                fitness += 1
+                print(f"Revealed safe tile. Fitness: {fitness}")
+                if self.check_win():
+                    fitness += 100
+                    print("AI won the game!")
+                    break
+        return fitness
 
     def check_win(self):
         for row in self.board.board_list:
             for tile in row:
                 if tile.type != "X" and not tile.revealed:
                     return False
-        return True        
+        return True
 
-    def events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit(0)
+def eval_genomes(genomes, config):
+    for genome_id, genome in genomes:
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        ai = MinesweeperAI(rows=5, cols=5, num_mines=3)
+        fitness = ai.play_game(net)
+        genome.fitness = fitness
+        print(f"Genome {genome_id} Fitness: {fitness}")
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-               mx, my = pygame.mouse.get_pos()
-               mx //= TILESIZE
-               my //= TILESIZE    
+def run_neat(config_file):
+    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         config_file)
 
-               if event.button == 1:
-                   if not self.board.board_list[mx][my].flagged:
-                       if not self.board.dig(mx, my):
-                           for row in self.board.board_list:
-                               for tile in row:
-                                   if tile.flagged and tile.type !="X":
-                                       tile.flagged = False
-                                       tile.revealed = True
-                                       tile.image = tile_not_mine
-                                   elif tile.type == "X":
-                                       tile.revealed = True
-                           self.playing = False          
-                            
-               if event.button == 3:
-                   if not self.board.board_list[mx][my].revealed:
-                       self.board.board_list[mx][my].flagged = not self.board.board_list[mx][my].flagged
-               if self.check_win():
-                   self.win = True
-                   self.playing = False
-                   for row in self.board.board_list:
-                       for tile in row:
-                           if not tile.revealed:
-                               tile.flagged = True     
+    population = neat.Population(config)
 
-    def end_screen(self):
-        self.screen.fill(BGCOLOUR)
-        font = pygame.font.Font(None, 74)
-        if self.win:
-            text = font.render('You Win!', True, (0, 255, 0))
+    population.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    population.add_reporter(stats)
+
+    winner = population.run(eval_genomes, 50)
+
+    with open("best_genome.pkl", "wb") as f:
+        pickle.dump(winner, f)
+    print("Best genome saved to 'best_genome.pkl'.")
+
+def play_with_best_genome(config_file, genome_file):
+    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         config_file)
+
+    with open(genome_file, "rb") as f:
+        best_genome = pickle.load(f)
+
+    net = neat.nn.FeedForwardNetwork.create(best_genome, config)
+
+    ai = MinesweeperAI(rows=5, cols=5, num_mines=3)
+
+    ai.play_game(net)
+
+if __name__ == "__main__":
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, "neat-config.txt")
+
+    mode = input("Enter 'train' to train the AI or 'play' to use the best genome: ").strip().lower()
+
+    if mode == "train":
+        run_neat(config_path)
+    elif mode == "play":
+        genome_file = "best_genome.pkl"
+        if os.path.exists(genome_file):
+            play_with_best_genome(config_path, genome_file)
         else:
-            text = font.render('Game Over', True, (255, 0, 0))
-        self.screen.blit(text, (self.width // 2 - text.get_width() // 2, self.height // 4))
-
-        restart_button = pygame.Rect(self.width // 2 - 100, self.height // 2 - 50, 200, 50)
-        quit_button = pygame.Rect(self.width // 2 - 100, self.height // 2 + 10, 200, 50)
-
-        pygame.draw.rect(self.screen, (0, 255, 0), restart_button)
-        pygame.draw.rect(self.screen, (255, 0, 0), quit_button)
-
-        font = pygame.font.Font(None, 36)
-        text = font.render('Restart', True, (0, 0, 0))
-        self.screen.blit(text, (restart_button.x + 50, restart_button.y + 10))
-        text = font.render('Quit', True, (0, 0, 0))
-        self.screen.blit(text, (quit_button.x + 70, quit_button.y + 10))
-
-        pygame.display.flip()
-
-        waiting = True
-        while waiting:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit(0)
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if restart_button.collidepoint(event.pos):
-                        waiting = False
-                        self.width = 800  # Set a larger default width
-                        self.height = 600 
-                        self.screen = pygame.display.set_mode((self.width, self.height))
-                        self.home_page()
-                        self.new()
-                        self.run()
-                    elif quit_button.collidepoint(event.pos):
-                        pygame.quit()
-                        quit(0)
-
-game = Game()
-while True:
-    game.home_page()
-    game.new()
-    game.run()
+            print("No saved genome found. Please train the AI first.")
+    else:
+        print("Invalid mode. Please enter 'train' or 'play'.")
