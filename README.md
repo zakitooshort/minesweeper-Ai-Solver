@@ -1,6 +1,5 @@
 # Minesweeper AI Solver
 
-![Minesweeper Screenshot](screenshot.png) <!-- Add a screenshot if you have one -->
 
 A Python implementation of the classic Minesweeper game with an AI solver powered by the **NEAT (NeuroEvolution of Augmenting Topologies)** algorithm. The AI learns to play Minesweeper by evolving neural networks over multiple generations.
 
