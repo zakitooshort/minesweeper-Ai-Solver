@@ -85,10 +85,9 @@ The game includes:
 
 4.Win by revealing all safe tiles without clicking on a mine.
 
-###Training the AI
+### Training the AI
 1.To train the AI using the NEAT algorithm, run:
 
-   ```bash
    Copy
    python main.py
 2.The AI will start with random moves and gradually improve over generations.
@@ -120,14 +119,14 @@ The AI uses a combination of logic and neural networks to solve Minesweeper:
 
 - The fittest networks are selected for reproduction, and mutations introduce new variations.
 ---
-##Technologies Used
+## Technologies Used ##
 - **Python: The core programming language.**
 
 - **Pygame: Used for rendering the game and handling user input.**
 
 - **NEAT-Python: Implements the NEAT algorithm for evolving neural networks.**
 
-##Contributing
+## Contributing 
 Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
 
 Fork the repository.
