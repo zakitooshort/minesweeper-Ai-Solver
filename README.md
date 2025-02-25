@@ -61,3 +61,88 @@ The game includes:
    ```bash
    git clone https://github.com/your-username/minesweeper-ai.git
    cd minesweeper-ai
+2.Install the required dependencies:
+
+   ```bash
+   Copy
+   pip install -r requirements.txt
+3.Run the game:
+
+   ```bash
+   Copy
+   python main.py
+---
+## Usage
+### Playing the Game
+1.Launch the game by running main.py.
+
+2.Select a difficulty level (Easy, Medium, or Hard).
+
+3.Use the mouse to:
+
+- Left-click to reveal tiles.
+
+- Right-click to flag potential mines.
+
+4.Win by revealing all safe tiles without clicking on a mine.
+
+###Training the AI
+1.To train the AI using the NEAT algorithm, run:
+
+   ```bash
+   Copy
+   python main.py
+2.The AI will start with random moves and gradually improve over generations.
+
+3.Observe the AI's performance and fitness scores in the console.
+---
+## How the AI Works
+The AI uses a combination of logic and neural networks to solve Minesweeper:
+
+1.Logic-Based Moves:
+
+- The AI analyzes revealed tiles to determine safe moves and flag mines.
+
+- If a tile's number equals the number of flagged neighboring tiles, the remaining unrevealed neighbors are safe to click.
+
+- If a tile's number minus the number of flagged neighbors equals the number of unrevealed neighbors, the unrevealed neighbors are mines and are flagged.
+
+2.Neural Network:
+
+- When no safe moves are available, the AI uses a NEAT-based neural network to make a guess.
+
+- The neural network takes the current board state as input and outputs a move.
+
+- The AI is rewarded for safe moves and penalized for clicking mines.
+
+3.NEAT Algorithm:
+
+- The NEAT algorithm evolves the neural network over generations.
+
+- The fittest networks are selected for reproduction, and mutations introduce new variations.
+---
+##Technologies Used
+- **Python: The core programming language.**
+
+- **Pygame: Used for rendering the game and handling user input.**
+
+- **NEAT-Python: Implements the NEAT algorithm for evolving neural networks.**
+
+##Contributing
+Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
+
+Fork the repository.
+
+Create a new branch for your feature or bugfix.
+
+Commit your changes and push to the branch.
+
+Submit a pull request with a detailed description of your changes.
+
+License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+Acknowledgments
+Inspired by the classic Minesweeper game.
+
+NEAT algorithm implementation by NEAT-Python.
