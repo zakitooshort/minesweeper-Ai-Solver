@@ -137,10 +137,12 @@ Commit your changes and push to the branch.
 
 Submit a pull request with a detailed description of your changes.
 
-License
+---
+## License
 This project is licensed under the MIT License. See the LICENSE file for details.
 
-Acknowledgments
+---
+## Acknowledgments
 Inspired by the classic Minesweeper game.
 
 NEAT algorithm implementation by NEAT-Python.
