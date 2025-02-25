@@ -58,18 +58,15 @@ The game includes:
 
 ### Steps
 1. Clone the repository:
-   ```bash
    git clone https://github.com/your-username/minesweeper-ai.git
    cd minesweeper-ai
 2.Install the required dependencies:
 
-   ```bash
    Copy
    pip install -r requirements.txt
 
 3.Run the game:
 
-   ```bash
    Copy
    python main.py
 
