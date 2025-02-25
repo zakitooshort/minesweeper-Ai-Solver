@@ -66,11 +66,13 @@ The game includes:
    ```bash
    Copy
    pip install -r requirements.txt
+
 3.Run the game:
 
    ```bash
    Copy
    python main.py
+
 ---
 ## Usage
 ### Playing the Game
