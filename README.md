@@ -129,20 +129,20 @@ The AI uses a combination of logic and neural networks to solve Minesweeper:
 ## Contributing 
 Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
 
-Fork the repository.
+1.Fork the repository.
 
-Create a new branch for your feature or bugfix.
+2.Create a new branch for your feature or bugfix.
 
-Commit your changes and push to the branch.
+3.Commit your changes and push to the branch.
 
-Submit a pull request with a detailed description of your changes.
+4.Submit a pull request with a detailed description of your changes.
 
 ---
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+- **This project is licensed under the MIT License. See the LICENSE file for details.**
 
 ---
 ## Acknowledgments
-Inspired by the classic Minesweeper game.
+- **Inspired by the classic Minesweeper game.**
 
-NEAT algorithm implementation by NEAT-Python.
+- **NEAT algorithm implementation by NEAT-Python.**
