@@ -1,148 +1,118 @@
 # Minesweeper AI Solver
 
-
-A Python implementation of the classic Minesweeper game with an AI solver powered by the **NEAT (NeuroEvolution of Augmenting Topologies)** algorithm. The AI learns to play Minesweeper by evolving neural networks over multiple generations.
-
----
-
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [How the AI Works](#how-the-ai-works)
-- [Technologies Used](#technologies-used)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
-## Overview
-
-This project is a Python implementation of Minesweeper with an AI solver that uses the **NEAT algorithm** to learn how to play the game. The AI starts with no knowledge of the game and evolves over generations to become better at detecting mines and solving the board.
-
-The game includes:
-- A fully functional Minesweeper game with customizable difficulty levels.
-- An AI that uses logic and probability to solve the game.
-- A NEAT-based neural network that learns to play Minesweeper through trial and error.
-
----
+A Minesweeper game with an AI solver using the NEAT (NeuroEvolution of Augmenting Topologies) algorithm to learn how to play the game.
 
 ## Features
 
-- **Classic Minesweeper Gameplay**:
-  - Three difficulty levels: **Easy**, **Medium**, and **Hard**.
-  - Left-click to reveal tiles, right-click to flag mines.
-  - Win by revealing all safe tiles without clicking on a mine.
+- Classic Minesweeper gameplay with multiple difficulty levels
+- AI solver using a trained neural network
+- Training system for the AI using NEAT
+- Visualization of AI gameplay
+- Deterministic solving for obvious moves
+- Ability to continue training from checkpoints
 
-- **AI Solver**:
-  - Uses **logic and probability** to determine safe moves.
-  - Flags tiles that are certain to contain mines.
-  - Falls back on a **NEAT-based neural network** for uncertain moves.
+## Prerequisites
 
-- **NEAT Algorithm**:
-  - Evolves neural networks over generations to improve performance.
-  - Rewards the AI for safe moves and penalizes it for clicking mines.
-
-- **Customizable Settings**:
-  - Adjust board size, number of mines, and NEAT parameters.
-
----
+- Python 3.6+
+- pygame
+- neat-python
+- numpy
 
 ## Installation
 
-### Prerequisites
-- **Python 3.7 or higher**
-- **Pygame**
-- **NEAT-Python**
+1. Clone the repository or download the source code
+2. Install the required packages:
 
-### Steps
-1. Clone the repository:
-   git clone https://github.com/your-username/minesweeper-ai.git
-   cd minesweeper-ai
-2.Install the required dependencies:
+```bash
+pip install pygame neat-python numpy
+```
 
-   Copy
-   pip install -r requirements.txt
+3. Run the game:
 
-3.Run the game:
+```bash
+python run.py
+```
 
-   Copy
-   python main.py
+## How to Play
 
----
-## Usage
-### Playing the Game
-1.Launch the game by running main.py.
+### Manual Play
 
-2.Select a difficulty level (Easy, Medium, or Hard).
+1. Select "Play Game" from the main menu
+2. Choose a difficulty level (Easy, Medium, Hard)
+3. Left-click to reveal a tile
+4. Right-click to flag/unflag a tile
+5. Try to uncover all non-mine tiles without hitting any mines!
 
-3.Use the mouse to:
+### AI Solver
 
-- Left-click to reveal tiles.
-
-- Right-click to flag potential mines.
-
-4.Win by revealing all safe tiles without clicking on a mine.
+1. Select "AI Solver" from the main menu
+2. Choose a difficulty level
+3. Watch as the AI attempts to solve the puzzle
 
 ### Training the AI
-1.To train the AI using the NEAT algorithm, run:
 
-   Copy
-   python main.py
-2.The AI will start with random moves and gradually improve over generations.
+1. Select "Train AI" from the main menu
+2. Choose an option:
+   - Train new AI: Start training from scratch
+   - Continue training from best genome: Continue training using the best genome so far
+   - Continue training from checkpoint: Resume training from a saved checkpoint
 
-3.Observe the AI's performance and fitness scores in the console.
----
 ## How the AI Works
-The AI uses a combination of logic and neural networks to solve Minesweeper:
 
-1.Logic-Based Moves:
+### NEAT Algorithm
 
-- The AI analyzes revealed tiles to determine safe moves and flag mines.
+The AI uses NEAT (NeuroEvolution of Augmenting Topologies), which is an evolutionary algorithm that creates artificial neural networks. 
 
-- If a tile's number equals the number of flagged neighboring tiles, the remaining unrevealed neighbors are safe to click.
+Key aspects of the implementation:
 
-- If a tile's number minus the number of flagged neighbors equals the number of unrevealed neighbors, the unrevealed neighbors are mines and are flagged.
+1. **Input Representation**: The AI receives a flattened representation of the board as input, where:
+   - -1 = Unrevealed tile
+   - 0-8 = Revealed tile with number of adjacent mines
+   - 9 = Revealed mine
+   - 10 = Flagged tile
 
-2.Neural Network:
+2. **Output**: The neural network outputs a value for each position on the board. The highest value for an unrevealed tile is chosen as the next move.
 
-- When no safe moves are available, the AI uses a NEAT-based neural network to make a guess.
+3. **Fitness Function**: The AI is rewarded for successfully revealing safe tiles and heavily rewarded for winning the game. It is penalized for hitting mines.
 
-- The neural network takes the current board state as input and outputs a move.
+4. **Hybrid Approach**: The AI combines deterministic rules for obvious moves with neural network decisions for uncertain situations.
 
-- The AI is rewarded for safe moves and penalized for clicking mines.
+### Deterministic Logic
 
-3.NEAT Algorithm:
+Before using the neural network, the AI attempts to make obvious moves using deterministic logic:
 
-- The NEAT algorithm evolves the neural network over generations.
+1. **Flag obvious mines**: If a revealed number has exactly that many unrevealed tiles around it, all those tiles must be mines and are flagged.
 
-- The fittest networks are selected for reproduction, and mutations introduce new variations.
----
-## Technologies Used ##
-- **Python: The core programming language.**
+2. **Reveal obvious safe tiles**: If a revealed number has exactly that many flags around it, all other unrevealed tiles around it must be safe and can be revealed.
 
-- **Pygame: Used for rendering the game and handling user input.**
+### Neural Network
 
-- **NEAT-Python: Implements the NEAT algorithm for evolving neural networks.**
+When deterministic logic can't make a decision, the neural network evaluates all possible moves and chooses the one with the highest confidence score.
 
-## Contributing 
-Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
+## Project Structure
 
-1.Fork the repository.
+- `run.py`: Main launcher script
+- `menu.py`: Main menu interface
+- `game.py`: Manual gameplay implementation
+- `main.py`: AI solver implementation
+- `sprites.py`: Game board and tile implementation
+- `settings.py`: Game settings and constants
+- `neat-config.txt`: Configuration for the NEAT algorithm
+- `best_genome.pkl`: Saved best AI (if training has been done)
 
-2.Create a new branch for your feature or bugfix.
+## Customization
 
-3.Commit your changes and push to the branch.
+You can customize the game by editing the following files:
 
-4.Submit a pull request with a detailed description of your changes.
+- `settings.py`: Adjust difficulty settings, board sizes, colors, etc.
+- `neat-config.txt`: Modify NEAT parameters to change how the AI evolves
 
----
 ## License
-- **This project is licensed under the MIT License. See the LICENSE file for details.**
 
----
+This project is open-source and available under the MIT License.
+
 ## Acknowledgments
-- **Inspired by the classic Minesweeper game.**
 
-- **NEAT algorithm implementation by NEAT-Python.**
+- Original Minesweeper game concept by Microsoft
+- NEAT algorithm by Kenneth O. Stanley
+- NEAT-Python implementation by CodeReclaimers
